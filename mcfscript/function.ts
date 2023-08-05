@@ -1,6 +1,10 @@
 import { CompareOperator, Dimension, anchorPosition } from "./tokenTypes";
 import { mcType, parse, scoreboardValue, selector } from "./types";
 
+interface SaveOpt{
+  path : string,
+  behaviourpackName : string
+}
 export async function saveNewFile(src: string, path:string){
   console.log(`[${path}] ${src}`)
 }
@@ -32,20 +36,28 @@ export class Execute implements mcType{
   ifs(value: scoreboardValue, op:CompareOperator, to:scoreboardValue | number, unless:boolean=false){return this.addString(unless? "unless score": "if score",value,op,to)}
   ifsm(to: scoreboardValue,range: string, unless:boolean=false){return this.addString(unless? "unless score": "if score",to,`matches ${range}`)}
 
-  run(cmd: mcType){ return this.addString("run",cmd)}
+  run(cmdFunc: (b:functionBuilder)=>void, saveOpt: SaveOpt){ return this.addString("run",f(cmdFunc,saveOpt)) }
 }
 
-export class functionBuilder implements mcType{
-  private builtString: string = "\n"
-  parse(){ return this.builtString }
-  run(cmd:mcType | string){this.builtString += parse(cmd)+"\n"}
+abstract class Builders{
+  builtString: string = "\n"
+  parse(){return this.builtString}
+  abstract run(cmd: string | mcType):void
+
+  execute(func: (e:Execute)=>void){
+    const exe = new Execute()
+    func(exe)
+    this.run(exe)
+  }
+  tp(target:selector,to:string){ this.run(`tp ${parse(target)} ${to}`) }
 }
-interface SaveOpt{
-  path : string,
-  behaviourpackName : string
+export class functionBuilder extends Builders{
+  run(cmd: string | mcType){this.builtString += `${parse(cmd)}\n`}
 }
+const functionBuilderProto = new functionBuilder()
+
 export function fNamed(name:string,buildFunction:(fb:functionBuilder)=>void,saveOpt: SaveOpt):mcType{
-  const fb = new functionBuilder()
+  const fb = Object.create(functionBuilderProto)
   buildFunction(fb)
   const parsed: string = fb.parse()
   saveNewFile(parsed, `${saveOpt.path}${name}.mcfunction`) 
