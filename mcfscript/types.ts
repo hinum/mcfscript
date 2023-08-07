@@ -1,10 +1,16 @@
 import {
   CompareOperator,
   Operator,
-  selectorVarible
-} from "./tokenTypes"
+  SelectorVarible
+} from "./tokenTypes.js"
 
-export interface mcType{
+type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
+  ? Acc[number]
+  : Enumerate<N, [...Acc, Acc['length']]>
+
+export type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
+
+export interface McType{
   parse : ()=>string,
   [propName: string]: any,
 }
@@ -12,11 +18,11 @@ export interface mcType{
 interface TagsList {
   [tag : string]: string | number
 }
-export interface selector extends mcType{
-  varible: selectorVarible,
+export interface Selector extends McType{
+  varible: SelectorVarible,
   tags: TagsList,
 }
-const selectorProto: selector = {
+const selectorProto: Selector = {
   varible : "p",
   tags : {},
   parse(){
@@ -24,7 +30,7 @@ const selectorProto: selector = {
         `[${Object.entries(this.tags).map(([tag,value])=>`${tag}=${value}`).join(",")}]` : ""}`
   }
 }
-export function select(varible:selectorVarible,tags:TagsList={}): selector{
+export function select(varible:SelectorVarible,tags:TagsList={}): Selector{
   return Object.create(selectorProto, {
     tags:{
       value : tags,
@@ -37,14 +43,14 @@ export function select(varible:selectorVarible,tags:TagsList={}): selector{
   })
 }
 
-export interface scoreboardValue extends mcType{
+export interface ScoreboardValue extends McType{
   scoreboard : string
-  entry: selector | string
+  entry: Selector | string
 }
-const scoreboardValueProto: scoreboardValue = {
+const scoreboardValueProto: ScoreboardValue = {
   scoreboard: "placeholder",
   entry: "placeholder",
-  op(operator: Operator | CompareOperator, using: scoreboardValue | number): mcType{
+  op(operator: Operator | CompareOperator, using: ScoreboardValue | number): McType{
     return {
       operated : this,
       operator , using,
@@ -54,7 +60,7 @@ const scoreboardValueProto: scoreboardValue = {
   random(min: number, max:number) { return `scoreboard players random ${this.parse()} ${min} ${max}`},
   parse(){ return `${this.scoreboard} ${parse(this.entry)}`}
 }
-export function score(scoreboard: string,entry: selector | string): scoreboardValue{
+export function score(scoreboard: string,entry: Selector | string): ScoreboardValue{
   return Object.create(scoreboardValueProto,{
     scoreboard:{
       value: scoreboard,
@@ -67,7 +73,7 @@ export function score(scoreboard: string,entry: selector | string): scoreboardVa
   })
 }
 
-export function parse(value: mcType | string | number){
+export function parse(value: McType | string | number){
   return (typeof value == "string" || typeof value == "number") ?
     value : value.parse()
 }
