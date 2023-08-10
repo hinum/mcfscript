@@ -68,8 +68,8 @@ export const pF = (value: number): FacingSinglePos=>`^${value}`
 export const pos = (x: positionSingle,y: positionSingle,z:positionSingle):Position=>`${x} ${y} ${z}`
 
 const isMcType = (value:any):value is {parse():string}=>value.parse !== undefined
-export function parse(value: any):string | number{
-  if(typeof value == "string" || typeof value == "number") return value
+export function parse(value: any):string{
+  if(typeof value != "object") return value.toString()
   if(isMcType(value)) return value.parse()
   return JSON.stringify(value)
 }

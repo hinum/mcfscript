@@ -1,9 +1,9 @@
 import { IntRange } from "./types"
 
 export type Dimension = 
-  "the_end" |
-  "nether" |
-  "overworld"
+  "the_end"
+  | "nether"
+  | "overworld"
 
 export type SelectorVarible =
   "a" | "p" | "e" | "s" | "r"
@@ -15,104 +15,68 @@ export type CompareOperator =
   ">" | "<" | "="
 
 type directions = 
-    "north" |
-    "south" |
-    "east" |
-    "west"
-
-type amethystBudStates= {
-  block_face : directions | "up" | "down" //might be broken watch out
-}
-type pillarAxisStates = {
-  pillar_axis : "x" | "y" | "z"
-}
-type beehiveState = {
-  facing: swneDirection,
-  honey_level: IntRange<0,5>
-}
-type noUDfacingState = {
-  facing_direction: dunsweDirection
-}
-type quartzState = pillarAxisStates&{
-  chisel_type:
-    "default" |
-    "chiseled" |
-    "lines" |
-    "smooth"
-}
-type cakeWithCandleState = {
-  lit: boolean
-}
-type buttonState = {
-  button_pressed_bit: boolean
-  facing_direction: duewsnDirection
-}
-type campfireState = {
-  direction: ewsnDirection
-  extinguished: boolean
-}
-type plantState = {
-  growth: IntRange<0,7>
-}
-type cauldronState = {
-  fill_level: IntRange<0,6>
-  cauldron_liquid:
-    "water" |
-    "lava" |
-    "powerder_snow"
-}
+  "north"
+  | "south"
+  | "east"
+  | "west"
 type borderConnection = 
-  "none" |
-  "short" |
-  "tall"
+  "none"
+  | "short"
+  | "tall"
 type dyeColors =
-  "white" |
-  "black" |
-  "orange" |
-  "magenta" |
-  "light_blue" |
-  "yellow" |
-  "lime" |
-  "pink" |
-  "gray" |
-  "light_gray" |
-  "cyan" |
-  "purple" |
-  "blue" |
-  "green" |
-  "red"
-type woodType =
-  "wooden" |
-  "spruce" |
-  "birch" |
-  "jungle" |
-  "acacia" |
-  "dark_oak" |
-  "mangrove" |
-  "bamboo" |
-  "cherry" |
-  "crimson" |
-  "warped"
+  "white"
+  | "black"
+  | "orange"
+  | "magenta"
+  | "light_blue"
+  | "yellow"
+  | "lime"
+  | "pink"
+  | "gray"
+  | "light_gray"
+  | "cyan"
+  | "purple"
+  | "blue"
+  | "green"
+  | "red"
+type overwoldWood =
+  "wooden"
+  | "spruce"
+  | "birch"
+  | "jungle"
+  | "acacia"
+  | "dark_oak"
+  | "mangrove"
+  | "cherry"
+type netherWood =
+  "crimson"
+  | "warped"
+type woodType = overwoldWood | netherWood | "bamboo"
 type ores =
-  "diamond" |
-  "lapis" |
-  "emerald" |
-  "redstone" |
-  "coal"
+  "diamond"
+  | "lapis"
+  | "emerald"
+  | "redstone"
+  | "coal"
 type ingotOre = 
-  "iron" |
-  "gold" |
-  "copper"
+  "iron"
+  | "gold"
+  | "copper"
 type genObj<props extends string,element> = {
   [prop in props]: element
 }
 type genType<l extends string> = "" | `${l}_`
+
 type copperBlocks = `${genType<"waxed">}${genType<
-  "exposed" |
-  "weathered" |
-  "oxidized"
+  "exposed"
+  | "weathered"
+  | "oxidized"
   >}${genType<"cut">}copper`
-type buttonType = woodType | "polished_blackstone" | "stone"
+type buttonType =
+  woodType 
+  | "polished_blackstone" 
+  | "stone"
+
 export enum RailDirection {
   goingNorth,
   goingWest,
@@ -171,83 +135,139 @@ export enum ewsnDirection{
   north
 }
 export type BlocksState = 
-  genObj<`${buttonType}_button`,buttonState> &
-  genObj<Exclude<copperBlocks,"copper">,{}>&
-  genObj<`${genType<dyeColors>}candle_cake`,cakeWithCandleState>&
+  genObj<`quartz_${"block"|"bricks"}`,{
+    pillar_axis : "x" | "y" | "z"
+    chisel_type:
+      "default"
+      | "chiseled"
+      | "lines"
+      | "smooth"
+  }>&
+
+  genObj<`${buttonType}_button`,{
+    button_pressed_bit: boolean
+    facing_direction: duewsnDirection
+  }> &
+
+  genObj<`${genType<dyeColors>}candle_cake`,{
+    lit:boolean
+  }>&
+
+  genObj<`${"small"|"medium"|"large"}_amethyst_bud` | "amethyst_cluster",{
+    block_face : directions | "up" | "down" //might be broken watch out
+  }>&
+
   genObj<`${genType<dyeColors>}candle`,{
     candles: IntRange<0,3>
     lit: boolean
   }>&
-  genObj<`${ores | ingotOre | "netherite"}_block`,{}>&
-  genObj<`${Exclude<genType<dyeColors>,"">}carpet`,{}>&
-  genObj<`raw_${ingotOre}_block`,{}>&
+  genObj<"carrots"| "beetroot",{
+    growth: IntRange<0,7>
+  }>&
+
+  genObj<"beehive"| "bee_nest",{
+    facing: swneDirection,
+    honey_level: IntRange<0,5>
+  }>&
+
+  genObj<`${genType<"soul">}campfire`,{
+    fill_level: IntRange<0,6>
+    cauldron_liquid:
+      "water"
+      | "lava"
+      | "powerder_snow"
+  }>&
+
+  genObj<`${genType<"lava">}cauldron`,{
+    direction: ewsnDirection
+    extinguished: boolean
+  }>&
+  
+  genObj<
+    "air"
+    | "deny"
+    | "allow"
+    | "ancient_debris"
+    | "beacon"
+    | "barrier"
+    | "bamboo_mosiac"
+    | "chain"
+    | "clay"
+    | "chrous_plant"
+    | "cartography_table"
+    | "blue_ice"
+    | "bookshelf"
+    | "blackstone"
+    | "chiseled_deepslate"
+    | "calcite"
+    | "budding_amethyst"
+
+    | `${"brick"| "amethyst"}_block`
+    | `${"nether_gold"|"quartz"}_ore`
+    | `${genType<"flowering">}azalea`
+
+    | `${dyeColors}_carpet`
+    | `raw_${ingotOre}_block`
+    | `${genType<"deepslate">}${ores | ingotOre}_ore`
+    | Exclude<copperBlocks,"copper">,Record<string,never>>&
+
+  genObj<
+    "wall_banner"
+    | `${genType<"lit">}${`${genType<"blast">}furnace`| "smoker"}`,
+  { facing_direction: dunsweDirection }>&
+
+  genObj<
+    "bone_block"
+    | `${genType<"polished"|"smooth">}basalt`
+    | `${genType<"stripped">}${
+      | "bamboo_block"
+      | `${overwoldWood}_log`
+      | `${netherWood}_stem`}`,
+  { pillar_axis : "x" | "y" | "z" }>&
 {
   activator_rail : {
     rail_data_bit: boolean
     rail_direction: RailDirection
   }
-  air: {}
-  allow: {}
-  deny: {}
 
-  small_amethyst_bud: amethystBudStates
-  medium_amethyst_bud: amethystBudStates
-  large_amethyst_bud: amethystBudStates
-  amethyst_cluster: amethystBudStates
-  
-  ancient_debris: {}
   stone: {
     stone_type: 
-      "stone" |
-      "granite" |
-      "granite_smooth" |
-      "diorite" |
-      "diorite_smooth" |
-      "andesite" |
-      "andesite_smooth"
+      "stone"
+      | "granite"
+      | "granite_smooth"
+      | "diorite"
+      | "diorite_smooth"
+      | "andesite"
+      | "andesite_smooth"
   }
   anvil: {
     damage: 
-      "broken" |
-      "slightly_damage" |
-      "undamage" |
-      "very_damaged"
+      "broken"
+      | "slightly_damage"
+      | "undamage"
+      | "very_damaged"
     direction: swneDirection
   }
-  azela: {}
-  flowering_azalea: {}
-
   bamboo: {
-  age_bit: boolean
-  bamboo_leaf_size:
-    "no_leaves" |
-    "small_leaves" |
-    "large_leaves"
-  bamboo_stalk_thickness:
-    "thin" |
-    "thick"
+    age_bit: boolean
+    bamboo_leaf_size:
+      "no_leaves"
+      | "small_leaves"
+      | "large_leaves"
+    bamboo_stalk_thickness:
+      "thin"
+      | "thick"
   }
   bamboo_sapling: {
     age_bit: boolean
   }
-  bamboo_mosaic: {}
-
   standing_banner: {
     ground_sign_direction: SBannerDirection
   }
-  wall_banner: noUDfacingState
-
   barrel: {
     facing_direction: duewsnDirection
     open_bit: BoolEnum
   }
-  barrier: {}
-
-  basalt: pillarAxisStates
-  polished_basalt: pillarAxisStates
-  smooth_basalt: pillarAxisStates
-
-  beacon: {}
   bed:{
     direction: swneDirection
     head_piece_bit: boolean
@@ -256,45 +276,24 @@ export type BlocksState =
   bedrock:{
     infiniburn_bit: boolean
   }
-
-  bee_nest: beehiveState,
-  beehive: beehiveState
-
-  beetroot: plantState
   bell:{
     attachment:
-      "standing" |
-      "hanging" |
-      "side" |
-      "multiple",
+      "standing"
+      | "hanging"
+      | "side"
+      | "multiple",
     direction: swneDirection,
     toggle_bit: boolean
   }
   big_dripleaf:{
     big_dripleaf_head: BoolEnum,
     big_dripleaf_tilt:
-      "none" |
-      "unstable" |
-      "partial_tilt" |
-      "full_tilt"
+      "none"
+      | "unstable"
+      | "partial_tilt"
+      | "full_tilt"
     direction: swneDirection
   }
-  blackstone: {}
-  amethyst_block: {}
-
-  blast_furnace: noUDfacingState
-  lit_blast_furnace: noUDfacingState
-
-  bamboo_block: pillarAxisStates
-  stripped_bamboo_block: pillarAxisStates
-
-  brick_block:{}
-  quartz_block: quartzState
-  quartz_bricks: quartzState
-
-  blue_ice:{}
-  bone_block: pillarAxisStates
-  bookshelf:{}
   border_block:genObj<`wall_connection_type_${directions}`,borderConnection>&{
     wall_post_bit: boolean
   }
@@ -302,43 +301,26 @@ export type BlocksState =
   bubble_column:{
     drag_down:boolean
   }
-  budding_amethyst:{}
   cactus:{
     age: IntRange<0,15>
   }
   cake: {
     bite_counter: IntRange<0,6>
   }
-  calcite:{}
   calibrated_sculk_sensor:{
     cardinal_directions : directions
     sculk_sensor_phase: IntRange<0,2>
   }
-  
-  campfire: campfireState
-  soul_campfire: campfireState
-
-  carrots: plantState
-  cartography_table: {}
-
-  cauldron: cauldronState
-  lava_cauldron: cauldronState
-
-  chain: pillarAxisStates
   chest:{
     facing_direction: dunsweDirection
     books_stored: IntRange<0,63>
   }
-  chiseled_deepslate:{}
   chorus_flower:{
     age: IntRange<0,5>
   }
-  chorus_plant:{}
-  clay:{}
   decorated_pot:{
-    //page for this does not exist on the wiki yet lol
+    warnig: "page do not exist on the wiki sorry"//page for this does not exist on the wiki yet lol
   }
-  
 }
 
 export type Blocks = keyof BlocksState
