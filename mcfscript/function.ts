@@ -1,5 +1,5 @@
 import { CompareOperator, Dimension,  Blocks, BlocksState, Operator, } from "./tokenTypes.js";
-import { createObj, McIntRange, parse, Position, Prototype, ScoreboardValue, Selector } from "./types.js";
+import { createObj, McIntRange, parse, parseObjType, Position, Prototype, ScoreboardValue, Selector } from "./types.js";
 
 interface SaveOpt {
   path: string,
@@ -52,7 +52,7 @@ const executeProto = new class{
   }
 
   ifb<b extends Blocks>(pos:Position, block: b, unless: boolean = false,blockState: Partial<BlocksState[b]> = {}) {
-    return this._addString(unless ? "unless block" : "if block", pos, block, blockState)
+    return this._addString(unless ? "unless block" : "if block", pos, block, parseObjType(blockState))
   }
   ifbs(begin: Position, end:Position, destination: Position, unless: boolean = false, scanMode: "all" | "masked"="all") { 
     return this._addString(unless ? "unless blocks" : "if blocks", begin, end,destination,scanMode)
@@ -101,7 +101,7 @@ abstract class Builders{
     this.run(`say "${value}"`)
   }
   setblock<b extends Blocks>(pos:Position,block: b,blockState:Partial<BlocksState[b]>={},setMode:"destroy"|"keep"|"replace"="replace") {
-    this.run(`setblock ${pos} ${block} ${parse(blockState)} ${setMode}`)
+    this.run(`setblock ${pos} ${block} ${parseObjType(blockState)} ${setMode}`)
   }
   createFunc(funcBuilder:(fb:functionBuilder)=>void){
     this.run(func(funcBuilder,this._saveOpt))

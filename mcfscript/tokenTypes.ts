@@ -15,16 +15,16 @@ export type CompareOperator =
   ">" | "<" | "="
 
 type directions = 
-  "north"
+  | "north"
   | "south"
   | "east"
   | "west"
 type borderConnection = 
-  "none"
+  | "none"
   | "short"
   | "tall"
 type dyeColors =
-  "white"
+  | "white"
   | "black"
   | "orange"
   | "magenta"
@@ -39,8 +39,14 @@ type dyeColors =
   | "blue"
   | "green"
   | "red"
+type coralColors =
+  | "blue"
+  | "pink"
+  | "purple"
+  | "red"
+  | "yellow"
 type overwoldWood =
-  "wooden"
+  | "wooden"
   | "spruce"
   | "birch"
   | "jungle"
@@ -49,31 +55,31 @@ type overwoldWood =
   | "mangrove"
   | "cherry"
 type netherWood =
-  "crimson"
+  | "crimson"
   | "warped"
 type woodType = overwoldWood | netherWood | "bamboo"
 type ores =
-  "diamond"
+  | "diamond"
   | "lapis"
   | "emerald"
   | "redstone"
   | "coal"
 type ingotOre = 
-  "iron"
+  | "iron"
   | "gold"
   | "copper"
 type genObj<props extends string,element> = {
   [prop in props]: element
 }
 type genType<l extends string> = "" | `${l}_`
-
+type invGenType<l extends string> = "" | `_${l}`
 type copperBlocks = `${genType<"waxed">}${genType<
-  "exposed"
+  | "exposed"
   | "weathered"
   | "oxidized"
   >}${genType<"cut">}copper`
 type buttonType =
-  woodType 
+  | woodType 
   | "polished_blackstone" 
   | "stone"
 
@@ -84,6 +90,9 @@ export enum RailDirection {
   acsendWest,
   ascendNorth,
   ascendSouth
+}
+export enum xyDirection{
+  x,y
 }
 export enum SBannerDirection {
   south,
@@ -134,11 +143,17 @@ export enum ewsnDirection{
   south,
   north
 }
+export enum eswnDirection{
+  east,
+  south,
+  west,
+  north
+}
 export type BlocksState = 
   genObj<`quartz_${"block"|"bricks"}`,{
     pillar_axis : "x" | "y" | "z"
     chisel_type:
-      "default"
+      | "default"
       | "chiseled"
       | "lines"
       | "smooth"
@@ -173,9 +188,13 @@ export type BlocksState =
   genObj<`${genType<"soul">}campfire`,{
     fill_level: IntRange<0,6>
     cauldron_liquid:
-      "water"
+      | "water"
       | "lava"
       | "powerder_snow"
+  }>&
+
+  genObj<`${dyeColors}_concrete_powder`,{
+    color: dyeColors
   }>&
 
   genObj<`${genType<"lava">}cauldron`,{
@@ -183,8 +202,29 @@ export type BlocksState =
     extinguished: boolean
   }>&
   
+  genObj<`coral_fan${invGenType<"dead">}`,{
+    coral_color: coralColors
+    direction: xyDirection
+  }>&
+  genObj<`coral_fan_hang${""|"2"|"3"}`,{
+    coral_hang_type_bit: boolean
+    coral_direction: ewsnDirection
+    dead_bit: boolean
+  }>&
+  
+  genObj<`daylight_detector${invGenType<"inverted">}`,{
+    redstone_signal: IntRange<0,15>
+  }>&
+  
+  genObj<`${woodType | "iron"}_door`,{
+    direction: eswnDirection
+    door_hinge_bit: boolean
+    open_bit: boolean
+    upper_block_bit: boolean
+  }>&
+
   genObj<
-    "air"
+    | "air"
     | "deny"
     | "allow"
     | "ancient_debris"
@@ -201,38 +241,65 @@ export type BlocksState =
     | "chiseled_deepslate"
     | "calcite"
     | "budding_amethyst"
+    | "conduit"
+    | "crafting_table"
+    | "crying_obsidian"
+    | "deadbush"
+    | "grass_path"
+    | "dragon_egg"
+    | "dried_kelp_block"
+    | "dripstone_block"
 
     | `${"brick"| "amethyst"}_block`
     | `${"nether_gold"|"quartz"}_ore`
     | `${genType<"flowering">}azalea`
+    | `${genType<"dead">}${
+      | "tube"
+      | "brian"
+      | "fire"
+      | "horn" }_coral`
+    | `${genType<"cracked">}deepslate_${"bricks"|"tiles"}`
 
     | `${dyeColors}_carpet`
     | `raw_${ingotOre}_block`
     | `${genType<"deepslate">}${ores | ingotOre}_ore`
-    | Exclude<copperBlocks,"copper">,Record<string,never>>&
+    | Exclude<copperBlocks,"copper">
+    | `${dyeColors}_concrete`,Record<string,never>>&
 
   genObj<
-    "wall_banner"
+    | "wall_banner"
     | `${genType<"lit">}${`${genType<"blast">}furnace`| "smoker"}`,
   { facing_direction: dunsweDirection }>&
 
   genObj<
-    "bone_block"
+    | "bione_block"
+    | "deepslate"
+
     | `${genType<"polished"|"smooth">}basalt`
     | `${genType<"stripped">}${
       | "bamboo_block"
       | `${overwoldWood}_log`
       | `${netherWood}_stem`}`,
-  { pillar_axis : "x" | "y" | "z" }>&
-{
-  activator_rail : {
+    { pillar_axis : "x" | "y" | "z" }>&
+  
+  genObj<"detector_rail"|"detector_rail",{
     rail_data_bit: boolean
     rail_direction: RailDirection
-  }
+  }>&
 
+  genObj<`${genType<"chained"|"repeating">}command_block`,{
+    conditional_bit: boolean,
+    facing_direction: dunsweDirection
+  }>&
+
+  genObj<"dispenser"|"dropper",{
+    facing_direction: dunsweDirection
+    triggered_bit: boolean
+  }>&
+{
   stone: {
     stone_type: 
-      "stone"
+      | "stone"
       | "granite"
       | "granite_smooth"
       | "diorite"
@@ -242,7 +309,7 @@ export type BlocksState =
   }
   anvil: {
     damage: 
-      "broken"
+      | "broken"
       | "slightly_damage"
       | "undamage"
       | "very_damaged"
@@ -251,11 +318,11 @@ export type BlocksState =
   bamboo: {
     age_bit: boolean
     bamboo_leaf_size:
-      "no_leaves"
+      | "no_leaves"
       | "small_leaves"
       | "large_leaves"
     bamboo_stalk_thickness:
-      "thin"
+      | "thin"
       | "thick"
   }
   bamboo_sapling: {
@@ -278,7 +345,7 @@ export type BlocksState =
   }
   bell:{
     attachment:
-      "standing"
+      | "standing"
       | "hanging"
       | "side"
       | "multiple",
@@ -288,7 +355,7 @@ export type BlocksState =
   big_dripleaf:{
     big_dripleaf_head: BoolEnum,
     big_dripleaf_tilt:
-      "none"
+      | "none"
       | "unstable"
       | "partial_tilt"
       | "full_tilt"
@@ -320,6 +387,13 @@ export type BlocksState =
   }
   decorated_pot:{
     warnig: "page do not exist on the wiki sorry"//page for this does not exist on the wiki yet lol
+  }
+  composter:{
+    composter_fill_level: IntRange<0,8>
+  }
+  coral_block:{
+    dead_bit: boolean
+    coral_color: coralColors
   }
 }
 

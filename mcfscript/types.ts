@@ -23,13 +23,11 @@ export function createObj(proto:Prototype,props:Record<string,any>){
   return Object.create(proto, generateDefindPropArg(props)) 
 }
 
-type TagsList = {
-  [tag : string]: string | number
-}
+type TagsList = Record<string,number| string>
 export type Selector = `@${SelectorVarible}${""|`[${string}]`}`
 const createSelect = (varible:SelectorVarible,tags:TagsList)=>{
   if (Object.keys(tags).length === 0) return `@${varible}`
-  return `@${varible}[${Object.entries(tags).map(([tag,value])=>`${tag}:${value},`).join(",")}]`
+  return `@${varible}${parseObjType(tags)}`
 }
 export const sP = (tags:TagsList={})=>createSelect("p",tags)
 export const sA = (tags:TagsList={})=>createSelect("a",tags)
@@ -67,6 +65,9 @@ export const pR = (value: number): RelativeSinglePos=>`~${value}`
 export const pF = (value: number): FacingSinglePos=>`^${value}`
 export const pos = (x: positionSingle,y: positionSingle,z:positionSingle):Position=>`${x} ${y} ${z}`
 
+export function parseObjType(blockState: Record<string,any>){
+  return `[${Object.entries(blockState).map(([key,value])=>`${JSON.stringify(key)}:${JSON.stringify(value)}`).join(",")}]`
+}
 const isMcType = (value:any):value is {parse():string}=>value.parse !== undefined
 export function parse(value: any):string{
   if(typeof value != "object") return value.toString()
